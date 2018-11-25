@@ -1,11 +1,8 @@
-from time import localtime, asctime
-
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QStatusBar, QComboBox, QListWidget, QFormLayout, QVBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QStatusBar, QListWidget
 from PyQt5.uic import loadUi
-import sqlite3 as lite
 
-from Database import Database, KEYS
+from Database import Database
 from ViolationItem import ViolationItem
 
 
@@ -20,46 +17,66 @@ class MainWindow(QMainWindow):
 
         self.search_button.clicked.connect(self.search)
         self.clear_button.clicked.connect(self.clear)
+        self.refresh_button.clicked.connect(self.refresh)
 
+        self.database = Database.getInstance()
+
+        cams = self.database.getCamList()
         self.cam_selector.clear()
-        self.cam_selector.addItems([
-            "1",
-            "2",
-            "3"
-        ])
+        self.cam_selector.addItems(name for name, location in cams)
         self.cam_selector.setCurrentIndex(0)
         self.cam_selector.currentIndexChanged.connect(self.camChanged)
 
+        self.updateCamInfo()
+
+        self.updateLog()
+
+    def updateSearch(self):
+        pass
+
+    def updateCamInfo(self):
+        count, location = self.database.getCamViolationsCount(self.cam_selector.currentText())
+        self.cam_id.setText(self.cam_selector.currentText())
+        self.address.setText(location)
+        self.total_records.setText(str(count))
+
+    def updateLog(self):
+        self.log_tabwidget.clear()
         violation_list = QListWidget(self)
         self.log_tabwidget.addTab(violation_list, "Violations")
-
-        # Database
-        self.database = Database.getInstance()
-        rows = self.database.getViolationsFromCam(str(self.cam_selector.currentText()))
-
+        rows = self.database.getUnclearedViolationsFromCam(str(self.cam_selector.currentText()))
         for row in rows:
             print(row)
             listWidget = ViolationItem()
-            listWidget.data = row
-            listWidget.setCarId(row[KEYS.CARID])
-            listWidget.setTime(asctime(localtime(row[KEYS.TIME])))
-            listWidget.setRule(row[KEYS.RULENAME])
-            listWidget.setCarImage(row[KEYS.CARIMAGE])
+            listWidget.setData(row)
             listWidgetItem = QtWidgets.QListWidgetItem(violation_list)
             listWidgetItem.setSizeHint(listWidget.sizeHint())
             violation_list.addItem(listWidgetItem)
             violation_list.setItemWidget(listWidgetItem, listWidget)
 
     @QtCore.pyqtSlot()
+    def refresh(self):
+        self.updateCamInfo()
+        self.updateLog()
+
+
+    @QtCore.pyqtSlot()
     def search(self):
         from SearchWindow import SearchWindow
-        searchWindow = SearchWindow(self)
+        searchWindow = SearchWindow(self, self.updateSearch)
         searchWindow.show()
 
     @QtCore.pyqtSlot()
     def clear(self):
-        pass
+        qm = QtWidgets.QMessageBox
+        prompt = qm.question(self, '', "Are you sure to reset all the values?", qm.Yes | qm.No)
+        if prompt == qm.Yes:
+            self.database.clearCamLog()
+            self.updateLog()
+        else:
+            pass
 
     @QtCore.pyqtSlot()
     def camChanged(self):
-        pass
+        self.updateCamInfo()
+        self.updateLog()

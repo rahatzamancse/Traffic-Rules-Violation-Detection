@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>948</width>
-    <height>419</height>
+    <width>877</width>
+    <height>416</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,3">
     <property name="leftMargin">
      <number>32</number>
     </property>
@@ -34,8 +34,11 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QComboBox" name="cam_selector">
-        <property name="editable">
+        <property name="enabled">
          <bool>true</bool>
+        </property>
+        <property name="editable">
+         <bool>false</bool>
         </property>
         <property name="currentText">
          <string/>
@@ -130,7 +133,7 @@
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <property name="documentMode">
          <bool>false</bool>
@@ -175,6 +178,13 @@
          <widget class="QPushButton" name="search_button">
           <property name="text">
            <string>Search</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="refresh_button">
+          <property name="text">
+           <string>Refresh</string>
           </property>
          </widget>
         </item>

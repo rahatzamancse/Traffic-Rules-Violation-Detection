@@ -1,3 +1,4 @@
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.uic import loadUi
 
@@ -33,6 +34,11 @@ class DetailLogWindow(QMainWindow):
         self.destroy()
 
     def deleteRecord(self):
-        db = Database.getInstance()
-        db.deleteViolation(carid=self.data[KEYS.CARID], ruleid=self.data[KEYS.RULEID], time=self.data[KEYS.TIME])
-        self.destroy()
+        qm = QtWidgets.QMessageBox
+        prompt = qm.question(self, '', "Are you sure to reset all the values?", qm.Yes | qm.No)
+        if prompt == qm.Yes:
+            db = Database.getInstance()
+            db.deleteViolation(carid=self.data[KEYS.CARID], ruleid=self.data[KEYS.RULEID], time=self.data[KEYS.TIME])
+            self.destroy()
+        else:
+            pass
