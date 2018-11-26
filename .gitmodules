@@ -1,0 +1,3 @@
+[submodule "python-qgmap"]
+	path = python-qgmap
+	url = https://github.com/vokimon/python-qgmap.git

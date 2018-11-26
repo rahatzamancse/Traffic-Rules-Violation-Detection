@@ -60,8 +60,6 @@ class MainWindow(QMainWindow):
 
     def updateLog(self):
         self.violation_list.clear()
-        violation_list = QListWidget(self)
-        self.log_tabwidget.addTab(violation_list, "Violations")
         rows = self.database.getUnclearedViolationsFromCam(str(self.cam_selector.currentText()))
         for row in rows:
             print(row)
@@ -81,7 +79,7 @@ class MainWindow(QMainWindow):
     @QtCore.pyqtSlot()
     def search(self):
         from SearchWindow import SearchWindow
-        searchWindow = SearchWindow(self, self.search_result)
+        searchWindow = SearchWindow(self.search_result, parent=self)
         searchWindow.show()
 
     @QtCore.pyqtSlot()
