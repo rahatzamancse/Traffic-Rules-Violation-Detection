@@ -46,6 +46,53 @@ class Database():
         rows = self.con.cursor().execute(command).fetchall()
         return [row[0] for row in rows]
 
+    def search(self, cam=None, color=None, license=None, time=None):
+        cur = self.con.cursor()
+        command = "SELECT camera.location, cars.id, cars.color, cars.first_sighted, cars.license_image, " \
+                  " cars.license_number, cars.car_image, cars.num_rules_broken, cars.owner," \
+                  " rules.name, rules.fine, violations.time, rules.id" \
+                  " FROM violations, rules, cars, camera" \
+                  " where rules.id = violations.rule" \
+                  " and violations.camera = camera.id" \
+                  " and cars.id = violations.car" \
+
+        if cam is not None:
+            command = command + " and violations.camera = '" + str(cam) + "'"
+        if color is not None:
+            command = command + " and cars.color = '" + str(color) + "'"
+        if time is not None:
+            # print(time[0])
+            # print(time[1])
+            command = command + " and violations.time >= " + str(time[0]) + " and violations.time <= " + str(time[1])
+
+        cur.execute(command)
+        rows = cur.fetchall()
+        ret = []
+        for row in rows:
+            dict = {}
+            dict[KEYS.LOCATION] = row[0]
+            dict[KEYS.CARID] = row[1]
+            dict[KEYS.CARCOLOR] = row[2]
+            dict[KEYS.FIRSTSIGHTED] = row[3]
+
+            carimage = QPixmap("car_images/" + row[4])
+            dict[KEYS.CARIMAGE] = carimage
+
+            dict[KEYS.LICENSENUMBER] = row[5]
+
+            licenseimage = QPixmap("license_images/" + row[6])
+            dict[KEYS.LICENSEIMAGE] = licenseimage
+
+            dict[KEYS.NUMRULESBROKEN] = row[7]
+            dict[KEYS.CAROWNER] = row[8]
+            dict[KEYS.RULENAME] = row[9]
+            dict[KEYS.RULEFINE] = row[10]
+            dict[KEYS.TIME] = row[11]
+            dict[KEYS.RULEID] = row[12]
+            ret.append(dict)
+        cur.close()
+        return ret
+
     def getUnclearedViolationsFromCam(self, cam):
         cur = self.con.cursor()
         command = "SELECT camera.location, cars.id, cars.color, cars.first_sighted, cars.license_image, " \
@@ -55,6 +102,7 @@ class Database():
                   " where violations.camera = '" + str(cam) + \
                   "' and rules.id = violations.rule" \
                   " and cars.id = violations.car" \
+                  " and violations.camera = camera.id" \
                   " and violations.cleared = false"
         cur.execute(command)
         rows = cur.fetchall()

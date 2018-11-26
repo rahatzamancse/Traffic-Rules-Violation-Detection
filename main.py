@@ -1,5 +1,5 @@
 import sys
-import qdarkstyle
+# import qdarkstyle
 from PyQt5.QtWidgets import QApplication
 from MainWindow import MainWindow
 
@@ -7,7 +7,7 @@ from MainWindow import MainWindow
 def main():
     app = QApplication(sys.argv)
     main_window = MainWindow()
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     main_window.show()
     sys.exit(app.exec_())
 

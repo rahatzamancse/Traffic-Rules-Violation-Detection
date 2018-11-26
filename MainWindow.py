@@ -1,8 +1,12 @@
+# import cv2
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QStatusBar, QListWidget
+from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QMainWindow, QStatusBar, QListWidget, QDialog, QVBoxLayout, QFormLayout, QLineEdit, \
+    QSizePolicy
 from PyQt5.uic import loadUi
 
 from Database import Database
+# from TrafficProcessor import TrafficProcessor
 from ViolationItem import ViolationItem
 
 
@@ -27,9 +31,23 @@ class MainWindow(QMainWindow):
         self.cam_selector.setCurrentIndex(0)
         self.cam_selector.currentIndexChanged.connect(self.camChanged)
 
+        self.log_tabwidget.clear()
+        self.violation_list = QListWidget(self)
+        self.search_result = QListWidget(self)
+        self.log_tabwidget.addTab(self.violation_list, "Violations")
+        self.log_tabwidget.addTab(self.search_result, "Search Result")
+
+        # self.processor = TrafficProcessor()
+
         self.updateCamInfo()
 
         self.updateLog()
+
+        # self.vs = cv2.VideoCapture("videos/video7.mp4")
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update)
+        self.timer.start(100)
 
     def updateSearch(self):
         pass
@@ -41,7 +59,7 @@ class MainWindow(QMainWindow):
         self.total_records.setText(str(count))
 
     def updateLog(self):
-        self.log_tabwidget.clear()
+        self.violation_list.clear()
         violation_list = QListWidget(self)
         self.log_tabwidget.addTab(violation_list, "Violations")
         rows = self.database.getUnclearedViolationsFromCam(str(self.cam_selector.currentText()))
@@ -49,10 +67,10 @@ class MainWindow(QMainWindow):
             print(row)
             listWidget = ViolationItem()
             listWidget.setData(row)
-            listWidgetItem = QtWidgets.QListWidgetItem(violation_list)
+            listWidgetItem = QtWidgets.QListWidgetItem(self.violation_list)
             listWidgetItem.setSizeHint(listWidget.sizeHint())
-            violation_list.addItem(listWidgetItem)
-            violation_list.setItemWidget(listWidgetItem, listWidget)
+            self.violation_list.addItem(listWidgetItem)
+            self.violation_list.setItemWidget(listWidgetItem, listWidget)
 
     @QtCore.pyqtSlot()
     def refresh(self):
@@ -63,7 +81,7 @@ class MainWindow(QMainWindow):
     @QtCore.pyqtSlot()
     def search(self):
         from SearchWindow import SearchWindow
-        searchWindow = SearchWindow(self, self.updateSearch)
+        searchWindow = SearchWindow(self, self.search_result)
         searchWindow.show()
 
     @QtCore.pyqtSlot()
