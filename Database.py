@@ -46,6 +46,40 @@ class Database():
         rows = self.con.cursor().execute(command).fetchall()
         return [row[0] for row in rows]
 
+
+    def insertIntoCar(self, color, lic_num, lic_img, car_img, owner):
+        sql = '''INSERT INTO cars(color,license_image, license_number, car_image, owner)
+                      VALUES(?,?,?,?,?) '''
+        cur = self.con.cursor()
+        cur.execute(sql, (color, lic_num, lic_img, car_img, owner))
+        cur.close()
+        self.con.commit()
+
+    def insertIntoViolations(self, camera, car, rule, time):
+        sql = '''INSERT INTO violations(camera, car, rule, time)
+                      VALUES(?,?,?,?) '''
+        cur = self.con.cursor()
+        cur.execute(sql, (camera, car, rule, self.convertTimeToDB(time)))
+        cur.close()
+        self.con.commit()
+
+    def insertIntoRules(self, rule, fine):
+        sql = '''INSERT INTO rules(name, fine)
+                      VALUES(?,?) '''
+        cur = self.con.cursor()
+        cur.execute(sql, (rule, fine))
+        cur.close()
+        self.con.commit()
+
+    def insertIntoCamera(self, id, location, x, y, group, file):
+        sql = '''INSERT INTO camera(id,location,coordinate_x, coordinate_y, feed, cam_group)
+                      VALUES(?,?,?,?,?,?) '''
+        cur = self.con.cursor()
+        cur.execute(sql, (id, location, x, y, file, group))
+        cur.close()
+        self.con.commit()
+
+
     def search(self, cam=None, color=None, license=None, time=None):
         cur = self.con.cursor()
         command = "SELECT camera.location, cars.id, cars.color, cars.first_sighted, cars.license_image, " \
@@ -54,7 +88,7 @@ class Database():
                   " FROM violations, rules, cars, camera" \
                   " where rules.id = violations.rule" \
                   " and violations.camera = camera.id" \
-                  " and cars.id = violations.car" \
+                  " and cars.id = violations.car"
 
         if cam is not None:
             command = command + " and violations.camera = '" + str(cam) + "'"
@@ -63,7 +97,7 @@ class Database():
         if time is not None:
             # print(time[0])
             # print(time[1])
-            command = command + " and violations.time >= " + str(time[0]) + " and violations.time <= " + str(time[1])
+            command = command + " and violations.time >= " + str(self.convertTimeToDB(time[0])) + " and violations.time <= " + str(self.convertTimeToDB(time[1]))
 
         cur.execute(command)
         rows = cur.fetchall()
@@ -149,22 +183,35 @@ class Database():
         cur = self.con.cursor()
         count = cur.execute(command).fetchall()[0][0]
         command = "select location from camera where id = '" + str(cam_id) + "'"
-        location = cur.execute(command).fetchall()[0][0]
+        res = cur.execute(command)
+        count2 = res.rowcount
+        location = None
+        if count2 > 0:
+            location = res.fetchall()[0][0]
         cur.close()
         return count, location
 
+    def getCamList(self, group):
+        if group is not None:
+            command = "select id, location from camera where cam_group = '{}'".format(str(group))
+        else:
+            command = "select id, location from camera"
 
-    def getCamList(self):
-        command = "select id, location from camera"
         cur = self.con.cursor()
         cur.execute(command)
         rows = cur.fetchall()
-        ret = []
-        for row in rows:
-            ret.append((row[0], row[1]))
+        ret = [(row[0], row[1]) for row in rows]
         cur.close()
         return ret
 
+    def getCamGroupList(self):
+        command = "select name from camera_group"
+        cur = self.con.cursor()
+        cur.execute(command)
+        rows = cur.fetchall()
+        ret = [row[0] for row in rows]
+        cur.close()
+        return ret
 
     def clearCamLog(self):
         command = "update violations set cleared = true"
@@ -172,3 +219,9 @@ class Database():
         cur.execute(command)
         cur.close()
         self.con.commit()
+
+    def convertTimeToDB(self, time):
+        pass
+
+    def convertTimeToGUI(self, time):
+        pass

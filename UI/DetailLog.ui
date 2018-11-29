@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>440</width>
-    <height>406</height>
+    <height>412</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -199,6 +199,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ticket_button">
+        <property name="text">
+         <string>Ticket</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="delete_button">

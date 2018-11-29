@@ -1,13 +1,18 @@
 # import cv2
+import qdarkstyle
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QMainWindow, QStatusBar, QListWidget, QDialog, QVBoxLayout, QFormLayout, QLineEdit, \
-    QSizePolicy
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMainWindow, QStatusBar, QListWidget, QAction, qApp, QMenu
 from PyQt5.uic import loadUi
 
 from Database import Database
 # from TrafficProcessor import TrafficProcessor
 from ViolationItem import ViolationItem
+from add_windows.AddCamera import AddCamera
+from add_windows.AddCar import AddCar
+from add_windows.AddRule import AddRule
+from add_windows.AddViolation import AddViolation
 
 
 class MainWindow(QMainWindow):
@@ -25,7 +30,13 @@ class MainWindow(QMainWindow):
 
         self.database = Database.getInstance()
 
-        cams = self.database.getCamList()
+        cam_groups = self.database.getCamGroupList()
+        self.camera_group.clear()
+        self.camera_group.addItems(name for name in cam_groups)
+        self.camera_group.setCurrentIndex(0)
+        self.camera_group.currentIndexChanged.connect(self.camGroupChanged)
+
+        cams = self.database.getCamList(self.camera_group.currentText())
         self.cam_selector.clear()
         self.cam_selector.addItems(name for name, location in cams)
         self.cam_selector.setCurrentIndex(0)
@@ -44,10 +55,95 @@ class MainWindow(QMainWindow):
         self.updateLog()
 
         # self.vs = cv2.VideoCapture("videos/video7.mp4")
+        self.initMenu()
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
         self.timer.start(100)
+
+    def initMenu(self):
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+
+        # File menu
+
+        ## add record manually
+        addRec = QMenu("Add Record", self)
+
+        act = QAction('Add Car', self)
+        act.setStatusTip('Add Car Manually')
+        act.triggered.connect(self.addCar)
+        addRec.addAction(act)
+
+        act = QAction('Add Rule', self)
+        act.setStatusTip('Add Rule Manually')
+        act.triggered.connect(self.addRule)
+        addRec.addAction(act)
+
+        act = QAction('Add Violation', self)
+        act.setStatusTip('Add Violation Manually')
+        act.triggered.connect(self.addViolation)
+        addRec.addAction(act)
+
+        act = QAction('Add Camera', self)
+        act.setStatusTip('Add Camera Manually')
+        act.triggered.connect(self.addCamera)
+        addRec.addAction(act)
+
+        fileMenu.addMenu(addRec)
+
+        # check archive record ( Create window and add button to restore them)
+        act = QAction('&Archives', self)
+        act.setStatusTip('Show Archived Records')
+        act.triggered.connect(self.showArch)
+        fileMenu.addAction(act)
+
+
+        settingsMenu = menubar.addMenu('&Settings')
+        themeMenu = QMenu("Themes", self)
+        settingsMenu.addMenu(themeMenu)
+
+        act = QAction('Dark', self)
+        act.setStatusTip('Dark Theme')
+        act.triggered.connect(lambda: qApp.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5()))
+        themeMenu.addAction(act)
+
+        act = QAction('White', self)
+        act.setStatusTip('White Theme')
+        act.triggered.connect(lambda: qApp.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5()))
+        themeMenu.addAction(act)
+
+        ## Add Exit
+        fileMenu.addSeparator()
+        act = QAction('&Exit', self)
+        act.setShortcut('Ctrl+Q')
+        act.setStatusTip('Exit application')
+        act.triggered.connect(qApp.quit)
+        fileMenu.addAction(act)
+
+
+    def addCamera(self):
+        addWin = AddCamera(parent=self)
+        addWin.show()
+
+    def addCar(self):
+        addWin = AddCar(parent=self)
+        addWin.show()
+
+    def addViolation(self):
+        pass
+        addWin = AddViolation(parent=self)
+        addWin.show()
+
+    def addRule(self):
+        addWin = AddRule(parent=self)
+        addWin.show()
+
+    def showArch(self):
+        print("Showing archinve")
+
+    def addRecManually(self):
+        print("Show add rec menu")
 
     def updateSearch(self):
         pass
@@ -96,3 +192,11 @@ class MainWindow(QMainWindow):
     def camChanged(self):
         self.updateCamInfo()
         self.updateLog()
+
+    @QtCore.pyqtSlot()
+    def camGroupChanged(self):
+        cams = self.database.getCamList(self.camera_group.currentText())
+        self.cam_selector.clear()
+        self.cam_selector.addItems(name for name, location in cams)
+        self.cam_selector.setCurrentIndex(0)
+        # self.cam_selector.currentIndexChanged.connect(self.camChanged)

@@ -26,7 +26,7 @@ class SearchWindow(QMainWindow):
 
         self.search_button.clicked.connect(self.search)
 
-        cams = Database.getInstance().getCamList()
+        cams = Database.getInstance().getCamList(None)
         self.camera.clear()
         self.camera.addItems(["None"])
         self.camera.addItems(name for name, location in cams)
