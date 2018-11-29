@@ -95,3 +95,4 @@ class TrafficProcessor:
         # cv2.imshow("Gray", gray)
         # cv2.imshow("Reference Frame", self.firstFrame)
         return frame
+

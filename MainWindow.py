@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
         self.initMenu()
 
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update)
+        self.timer.timeout.connect(self.update_image)
         self.timer.start(100)
 
     def initMenu(self):
@@ -147,6 +147,13 @@ class MainWindow(QMainWindow):
 
     def updateSearch(self):
         pass
+
+
+    def update_image(self):
+        # img = cv2.get()
+        # img = crossViolation(img)
+        pass
+
 
     def updateCamInfo(self):
         count, location = self.database.getCamViolationsCount(self.cam_selector.currentText())
