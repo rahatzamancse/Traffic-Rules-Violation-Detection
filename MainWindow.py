@@ -1,13 +1,13 @@
-# import cv2
+import cv2
 import qdarkstyle
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QTimer
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QStatusBar, QListWidget, QAction, qApp, QMenu
 from PyQt5.uic import loadUi
 
 from Database import Database
-# from TrafficProcessor import TrafficProcessor
+from TrafficProcessor import TrafficProcessor
 from ViolationItem import ViolationItem
 from add_windows.AddCamera import AddCamera
 from add_windows.AddCar import AddCar
@@ -19,6 +19,10 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         loadUi("./UI/MainWindow.ui", self)
+
+        self.live_preview.setScaledContents(True)
+        from PyQt5.QtWidgets import QSizePolicy
+        self.live_preview.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
 
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
@@ -38,9 +42,11 @@ class MainWindow(QMainWindow):
 
         cams = self.database.getCamList(self.camera_group.currentText())
         self.cam_selector.clear()
-        self.cam_selector.addItems(name for name, location in cams)
+        self.cam_selector.addItems(name for name, location, feed in cams)
         self.cam_selector.setCurrentIndex(0)
         self.cam_selector.currentIndexChanged.connect(self.camChanged)
+
+        self.processor = TrafficProcessor(self.cam_selector.currentText())
 
         self.log_tabwidget.clear()
         self.violation_list = QListWidget(self)
@@ -48,18 +54,18 @@ class MainWindow(QMainWindow):
         self.log_tabwidget.addTab(self.violation_list, "Violations")
         self.log_tabwidget.addTab(self.search_result, "Search Result")
 
-        # self.processor = TrafficProcessor()
 
+        self.feed = None
+        self.vs = None
         self.updateCamInfo()
 
         self.updateLog()
 
-        # self.vs = cv2.VideoCapture("videos/video7.mp4")
         self.initMenu()
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_image)
-        self.timer.start(100)
+        self.timer.start(50)
 
     def initMenu(self):
         menubar = self.menuBar()
@@ -142,21 +148,29 @@ class MainWindow(QMainWindow):
     def showArch(self):
         print("Showing archinve")
 
-    def addRecManually(self):
-        print("Show add rec menu")
-
     def updateSearch(self):
         pass
 
 
     def update_image(self):
-        # img = cv2.get()
-        # img = crossViolation(img)
-        pass
+        _, frame = self.vs.read()
 
+
+        packet = self.processor.cross_violation(frame)
+        cropped_car_images = packet['list_of_cars']  # list of cropped images of violated cars
+        print(cropped_car_images)
+
+
+
+        qimg = self.toQImage(packet['frame'])
+        self.live_preview.setPixmap(QPixmap.fromImage(qimg))
 
     def updateCamInfo(self):
-        count, location = self.database.getCamViolationsCount(self.cam_selector.currentText())
+        count, location, self.feed = self.database.getCamDetails(self.cam_selector.currentText())
+        self.feed = 'videos/' + self.feed
+        self.processor = TrafficProcessor(self.cam_selector.currentText())
+        self.vs = cv2.VideoCapture(self.feed)
+        # print(count, location, self.feed)
         self.cam_id.setText(self.cam_selector.currentText())
         self.address.setText(location)
         self.total_records.setText(str(count))
@@ -165,7 +179,7 @@ class MainWindow(QMainWindow):
         self.violation_list.clear()
         rows = self.database.getUnclearedViolationsFromCam(str(self.cam_selector.currentText()))
         for row in rows:
-            print(row)
+            # print(row)
             listWidget = ViolationItem()
             listWidget.setData(row)
             listWidgetItem = QtWidgets.QListWidgetItem(self.violation_list)
@@ -194,6 +208,20 @@ class MainWindow(QMainWindow):
             self.updateLog()
         else:
             pass
+
+    def toQImage(self, raw_img):
+        from numpy import copy
+        img = copy(raw_img)
+        qformat = QImage.Format_Indexed8
+        if len(img.shape) == 3:
+            if img.shape[2] == 4:
+                qformat = QImage.Format_RGBA8888
+            else:
+                qformat = QImage.Format_RGB888
+
+        outImg = QImage(img.tobytes(), img.shape[1], img.shape[0], img.strides[0], qformat)
+        outImg = outImg.rgbSwapped()
+        return outImg
 
     @QtCore.pyqtSlot()
     def camChanged(self):

@@ -178,29 +178,32 @@ class Database():
         cur.close()
         self.con.commit()
 
-    def getCamViolationsCount(self, cam_id):
+    def getCamDetails(self, cam_id):
         command = "select count(*) from violations where camera = '" + str(cam_id) + "'"
         cur = self.con.cursor()
         count = cur.execute(command).fetchall()[0][0]
-        command = "select location from camera where id = '" + str(cam_id) + "'"
-        res = cur.execute(command)
-        count2 = res.rowcount
-        location = None
-        if count2 > 0:
-            location = res.fetchall()[0][0]
         cur.close()
-        return count, location
+
+        command = "select location, feed from camera where id = '" + str(cam_id) + "'"
+        cur = self.con.cursor()
+        res = cur.execute(command).fetchall()
+        location = None
+        feed = None
+        print(res)
+        location, feed = res[0]
+        cur.close()
+        return count, location, feed
 
     def getCamList(self, group):
         if group is not None:
-            command = "select id, location from camera where cam_group = '{}'".format(str(group))
+            command = "select id, location, feed from camera where cam_group = '{}'".format(str(group))
         else:
-            command = "select id, location from camera"
+            command = "select id, location, feed from camera"
 
         cur = self.con.cursor()
         cur.execute(command)
         rows = cur.fetchall()
-        ret = [(row[0], row[1]) for row in rows]
+        ret = [(row[0], row[1], row[2]) for row in rows]
         cur.close()
         return ret
 
