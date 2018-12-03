@@ -1,8 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.uic import loadUi
 
-from Database import Database
-
 
 class AddMainWindow(QMainWindow):
     def __init__(self, parent=None, ui=None):

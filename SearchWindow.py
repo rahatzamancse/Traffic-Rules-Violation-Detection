@@ -29,7 +29,7 @@ class SearchWindow(QMainWindow):
         cams = Database.getInstance().getCamList(None)
         self.camera.clear()
         self.camera.addItems(["None"])
-        self.camera.addItems(name for name, location in cams)
+        self.camera.addItems(id for id, cam, feed in cams)
         self.camera.setCurrentIndex(0)
 
     def search(self):

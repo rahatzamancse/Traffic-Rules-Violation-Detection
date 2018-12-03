@@ -16,8 +16,7 @@ class AddCar(AddMainWindow):
         lic_img = str(self.license_img.text())
         car_img = str(self.car_img.text())
         owner = str(self.owner.text())
-        file = str(self.file.text())
-        Database.getInstance().insertIntoCar(color, lic_num, lic_img, car_img, owner, file)
+        Database.getInstance().insertIntoCars(color, lic_num, lic_img, car_img, owner)
         self.destroy()
 
     def getFile(self, lineEdit):

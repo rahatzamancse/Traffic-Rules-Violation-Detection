@@ -46,14 +46,23 @@ class Database():
         rows = self.con.cursor().execute(command).fetchall()
         return [row[0] for row in rows]
 
+    def insertIntoCars(self, car_id='', color='', lic_num='', lic_img='', car_img='', owner=''):
+        sql = '''INSERT INTO cars(id, color,license_image, license_number, car_image, owner)
+                      VALUES(?,?,?,?,?,?) '''
 
-    def insertIntoCar(self, color, lic_num, lic_img, car_img, owner):
-        sql = '''INSERT INTO cars(color,license_image, license_number, car_image, owner)
-                      VALUES(?,?,?,?,?) '''
+        car_img = car_img.split('/')[-1]
+        lic_img = lic_img.split('/')[-1]
         cur = self.con.cursor()
-        cur.execute(sql, (color, lic_num, lic_img, car_img, owner))
+        cur.execute(sql, (car_id, color, lic_num, lic_img, car_img, owner))
         cur.close()
         self.con.commit()
+
+    def getMaxCarId(self):
+        sql = '''select max(id) from cars'''
+        carid = self.con.cursor().execute(sql).fetchall()[0][0]
+        if carid is None:
+            carid = 1
+        return carid
 
     def insertIntoViolations(self, camera, car, rule, time):
         sql = '''INSERT INTO violations(camera, car, rule, time)
@@ -74,11 +83,11 @@ class Database():
     def insertIntoCamera(self, id, location, x, y, group, file):
         sql = '''INSERT INTO camera(id,location,coordinate_x, coordinate_y, feed, cam_group)
                       VALUES(?,?,?,?,?,?) '''
+        file = file.split('/')[-1]
         cur = self.con.cursor()
         cur.execute(sql, (id, location, x, y, file, group))
         cur.close()
         self.con.commit()
-
 
     def search(self, cam=None, color=None, license=None, time=None):
         cur = self.con.cursor()
@@ -95,9 +104,8 @@ class Database():
         if color is not None:
             command = command + " and cars.color = '" + str(color) + "'"
         if time is not None:
-            # print(time[0])
-            # print(time[1])
-            command = command + " and violations.time >= " + str(self.convertTimeToDB(time[0])) + " and violations.time <= " + str(self.convertTimeToDB(time[1]))
+            command = command + " and violations.time >= " + str(
+                self.convertTimeToDB(time[0])) + " and violations.time <= " + str(self.convertTimeToDB(time[1]))
 
         cur.execute(command)
         rows = cur.fetchall()
@@ -127,17 +135,22 @@ class Database():
         cur.close()
         return ret
 
-    def getUnclearedViolationsFromCam(self, cam):
+    def getViolationsFromCam(self, cam, cleared=False):
         cur = self.con.cursor()
         command = "SELECT camera.location, cars.id, cars.color, cars.first_sighted, cars.license_image, " \
                   " cars.license_number, cars.car_image, cars.num_rules_broken, cars.owner," \
                   " rules.name, rules.fine, violations.time, rules.id" \
                   " FROM violations, rules, cars, camera" \
-                  " where violations.camera = '" + str(cam) + \
-                  "' and rules.id = violations.rule" \
+                  " where rules.id = violations.rule" \
                   " and cars.id = violations.car" \
-                  " and violations.camera = camera.id" \
-                  " and violations.cleared = false"
+                  " and violations.camera = camera.id"
+        if cam is not None:
+            command = command + " and violations.camera = '" + str(cam) + "'"
+        if cleared:
+            command = command + " and violations.cleared = true"
+        else:
+            command = command + " and violations.cleared = false"
+
         cur.execute(command)
         rows = cur.fetchall()
         ret = []
@@ -148,7 +161,8 @@ class Database():
             dict[KEYS.CARCOLOR] = row[2]
             dict[KEYS.FIRSTSIGHTED] = row[3]
 
-            carimage = QPixmap("car_images/" + row[4])
+            carImagePath = "car_images/" + row[6]
+            carimage = QPixmap(carImagePath)
             dict[KEYS.CARIMAGE] = carimage
 
             dict[KEYS.LICENSENUMBER] = row[5]
@@ -168,11 +182,8 @@ class Database():
 
     def deleteViolation(self, carid, ruleid, time):
         cur = self.con.cursor()
-        # command = "delete from violations " \
-        #           "where car = " + str(carid) + " and rule = " + str(ruleid) + " and time = " + str(time)
         command = "update violations set cleared = true " \
                   "where car = " + str(carid) + " and rule = " + str(ruleid) + " and time = " + str(time)
-        # print(command)
         rowcount = cur.execute(command).rowcount
         print("Deleted " + str(rowcount) + " rows")
         cur.close()
@@ -189,10 +200,23 @@ class Database():
         res = cur.execute(command).fetchall()
         location = None
         feed = None
-        print(res)
         location, feed = res[0]
         cur.close()
         return count, location, feed
+
+    def deleteAllCars(self):
+        commad = "delete from cars"
+        cur = self.con.cursor()
+        cur.execute(commad)
+        cur.close()
+        self.con.commit()
+
+    def deleteAllViolations(self):
+        commad = "delete from violations"
+        cur = self.con.cursor()
+        cur.execute(commad)
+        cur.close()
+        self.con.commit()
 
     def getCamList(self, group):
         if group is not None:

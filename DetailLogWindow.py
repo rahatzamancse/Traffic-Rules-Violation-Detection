@@ -1,3 +1,5 @@
+import os
+
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.uic import loadUi
@@ -12,7 +14,25 @@ class DetailLogWindow(QMainWindow):
         self.data = data
         self.car_image.setScaledContents(True)
         self.license_image.setScaledContents(True)
+        self.ticket_button.clicked.connect(self.ticket)
         self.initData()
+
+    def ticket(self):
+        file_name = 'tickets/' + str(self.data[KEYS.CARID]) + '.txt'
+        with open(file_name, 'w') as file:
+            lic_num = str(self.license_number_lineedit.text())
+            rule = self.data[KEYS.RULENAME]
+            fine = str(self.data[KEYS.RULEFINE])
+            file.write('########################################\n')
+            file.write('#  License Number                      #\n')
+            file.write('#' + ''.join([' ' for i in range(35 - len(lic_num))]) + lic_num + '   #\n')
+            file.write('#  Rule Broken :                       #\n')
+            file.write('#'+''.join([' ' for i in range(35 - len(rule))]) + rule + '   #\n')
+            file.write('#  Fine :                              #\n')
+            file.write('#'+''.join([' ' for i in range(35 - len(fine))]) + fine + '   #\n')
+            file.write('########################################\n')
+        self.destroy()
+        os.popen("deepin-editor " + file_name)
 
     def initData(self):
         self.cam_id.setText(str(self.data[KEYS.CARID]))

@@ -1,3 +1,5 @@
+import time
+
 import cv2
 import qdarkstyle
 from PyQt5 import QtCore, QtWidgets
@@ -6,6 +8,7 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QStatusBar, QListWidget, QAction, qApp, QMenu
 from PyQt5.uic import loadUi
 
+from Archive import ArchiveWindow
 from Database import Database
 from TrafficProcessor import TrafficProcessor
 from ViolationItem import ViolationItem
@@ -33,6 +36,8 @@ class MainWindow(QMainWindow):
         self.refresh_button.clicked.connect(self.refresh)
 
         self.database = Database.getInstance()
+        self.database.deleteAllCars()
+        self.database.deleteAllViolations()
 
         cam_groups = self.database.getCamGroupList()
         self.camera_group.clear()
@@ -54,7 +59,6 @@ class MainWindow(QMainWindow):
         self.log_tabwidget.addTab(self.violation_list, "Violations")
         self.log_tabwidget.addTab(self.search_result, "Search Result")
 
-
         self.feed = None
         self.vs = None
         self.updateCamInfo()
@@ -66,6 +70,13 @@ class MainWindow(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_image)
         self.timer.start(50)
+
+        # trafficLightTimer = QTimer(self)
+        # trafficLightTimer.timeout.connect(self.toggleLight)
+        # trafficLightTimer.start(5000)
+
+    def toggleLight(self):
+        self.processor.light = 'Green' if self.processor.light == 'Red' else 'Red'
 
     def initMenu(self):
         menubar = self.menuBar()
@@ -104,7 +115,6 @@ class MainWindow(QMainWindow):
         act.triggered.connect(self.showArch)
         fileMenu.addAction(act)
 
-
         settingsMenu = menubar.addMenu('&Settings')
         themeMenu = QMenu("Themes", self)
         settingsMenu.addMenu(themeMenu)
@@ -127,6 +137,13 @@ class MainWindow(QMainWindow):
         act.triggered.connect(qApp.quit)
         fileMenu.addAction(act)
 
+    def keyReleaseEvent(self, event):
+        if event.key() == QtCore.Qt.Key_G:
+            self.processor.light = "Green"
+        elif event.key() == QtCore.Qt.Key_R:
+            self.processor.light = "Red"
+        elif event.key() == QtCore.Qt.Key_S:
+            self.toggleLight()
 
     def addCamera(self):
         addWin = AddCamera(parent=self)
@@ -146,21 +163,28 @@ class MainWindow(QMainWindow):
         addWin.show()
 
     def showArch(self):
-        print("Showing archinve")
+        addWin = ArchiveWindow(parent=self)
+        addWin.show()
 
     def updateSearch(self):
         pass
 
-
     def update_image(self):
         _, frame = self.vs.read()
 
-
         packet = self.processor.cross_violation(frame)
-        cropped_car_images = packet['list_of_cars']  # list of cropped images of violated cars
-        print(cropped_car_images)
+        cars_violated = packet['list_of_cars']  # list of cropped images of violated cars
+        if len(cars_violated) > 0:
+            for c in cars_violated:
+                carId = self.database.getMaxCarId() + 1
+                car_img = 'car_' + str(carId) + '.png'
+                cv2.imwrite('car_images/' + car_img, c)
+                self.database.insertIntoCars(car_id=carId, car_img=car_img)
 
+                self.database.insertIntoViolations(camera=self.cam_selector.currentText(), car=carId, rule='1',
+                                                   time=time.time())
 
+            self.updateLog()
 
         qimg = self.toQImage(packet['frame'])
         self.live_preview.setPixmap(QPixmap.fromImage(qimg))
@@ -170,16 +194,14 @@ class MainWindow(QMainWindow):
         self.feed = 'videos/' + self.feed
         self.processor = TrafficProcessor(self.cam_selector.currentText())
         self.vs = cv2.VideoCapture(self.feed)
-        # print(count, location, self.feed)
         self.cam_id.setText(self.cam_selector.currentText())
         self.address.setText(location)
         self.total_records.setText(str(count))
 
     def updateLog(self):
         self.violation_list.clear()
-        rows = self.database.getUnclearedViolationsFromCam(str(self.cam_selector.currentText()))
+        rows = self.database.getViolationsFromCam(str(self.cam_selector.currentText()))
         for row in rows:
-            # print(row)
             listWidget = ViolationItem()
             listWidget.setData(row)
             listWidgetItem = QtWidgets.QListWidgetItem(self.violation_list)
@@ -191,7 +213,6 @@ class MainWindow(QMainWindow):
     def refresh(self):
         self.updateCamInfo()
         self.updateLog()
-
 
     @QtCore.pyqtSlot()
     def search(self):

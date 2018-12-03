@@ -18,16 +18,13 @@ class ViolationItem (QtWidgets.QListWidget):
         self.data = data
         self.setCarId(data[KEYS.CARID])
         self.setTime(asctime(localtime(data[KEYS.TIME])))
-        # self.setRule(row[KEYS.RULENAME])
         self.setCarImage(data[KEYS.CARIMAGE])
-
 
     def showDetails(self):
         window = DetailLogWindow(self.data, self)
         window.show()
 
     def setCarId(self, id):
-        print(self.carid)
         self.carid.setText(str(id))
 
     def setTime(self, time):
