@@ -1,6 +1,4 @@
-# import the necessary packages
 import datetime
-import time
 
 import cv2
 import imutils
@@ -10,7 +8,7 @@ import imutils
 
 class TrafficProcessor:
 
-    def __init__(self, camera_id):
+    def __init__(self):
         self.firstFrame = None
         self.light = "Green"
         self.cnt = 0
@@ -19,16 +17,11 @@ class TrafficProcessor:
         self.duration = 200  # millisecond
         self.freq = 900  # Hz
 
-        if camera_id == 'cam_01':
-            self.zone1 = (100, 150)
-            self.zone2 = (450, 145)
-            self.thres = 30
-
-        elif camera_id == 'cam_02':
-            self.zone1 = (100, 150)
-            self.zone2 = (450, 145)
-            self.thres = 6
-            self.dynamic = True
+        # cam specific properties
+        self.zone1 = (100, 150)
+        self.zone2 = (450, 145)
+        self.thres = 30
+        self.dynamic = True
 
     def cross_violation(self, frame):
         text = ""
@@ -67,12 +60,12 @@ class TrafficProcessor:
             # compute the bounding box for the contour, draw it on the frame,
             # and update the text
             (x, y, w, h) = cv2.boundingRect(c)
-            if ((x + w / 2) > self.zone1[0] and (x + w / 2) < self.zone2[0] and (y + h / 2) < self.zone1[1] + 100 and (
+            if (self.zone1[0] < (x + w / 2) < self.zone2[0] and (y + h / 2) < self.zone1[1] + 100 and (
                     y + h / 2) > self.zone2[1] - 100):
                 isCar = True
 
-            if self.light == "Red" and (x + w / 2) > self.zone1[0] and (x + w / 2) < self.zone2[0] and (y + h / 2) < \
-                    self.zone1[1] and (y + h / 2) > self.zone2[1]:
+            if self.light == "Red" and self.zone1[0] < (x + w / 2) < self.zone2[0] and self.zone1[1] > (y + h / 2) > \
+                    self.zone2[1]:
                 # winsound.Beep(self.freq, self.duration)
                 rcar = self.frame[y:y + h, x:x + w]
                 rcar = cv2.resize(rcar, (0, 0), fx=4, fy=4)
@@ -83,10 +76,9 @@ class TrafficProcessor:
 
             cv2.rectangle(self.frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
 
-        if isCar == False or self.dynamic == True:
+        if self.dynamic or not isCar:
             self.firstFrame = self.gray
         # draw the text and timestamp on the frame
-        color = (0, 0, 255)
         if self.light == "Green":
             color = (0, 255, 0)
         else:
