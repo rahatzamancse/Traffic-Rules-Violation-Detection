@@ -10,13 +10,13 @@ from PyQt5.uic import loadUi
 
 from Archive import ArchiveWindow
 from Database import Database
-from TrafficProcessor import TrafficProcessor
+from processor.MainProcessor import MainProcessor
+from processor.TrafficProcessor import TrafficProcessor
 from ViolationItem import ViolationItem
 from add_windows.AddCamera import AddCamera
 from add_windows.AddCar import AddCar
 from add_windows.AddRule import AddRule
 from add_windows.AddViolation import AddViolation
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -26,6 +26,8 @@ class MainWindow(QMainWindow):
         self.live_preview.setScaledContents(True)
         from PyQt5.QtWidgets import QSizePolicy
         self.live_preview.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+
+        self.cam_clear_gaurd = False
 
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
@@ -51,7 +53,7 @@ class MainWindow(QMainWindow):
         self.cam_selector.setCurrentIndex(0)
         self.cam_selector.currentIndexChanged.connect(self.camChanged)
 
-        self.processor = TrafficProcessor(self.cam_selector.currentText())
+        self.processor = MainProcessor(self.cam_selector.currentText())
 
         self.log_tabwidget.clear()
         self.violation_list = QListWidget(self)
@@ -76,7 +78,7 @@ class MainWindow(QMainWindow):
         # trafficLightTimer.start(5000)
 
     def toggleLight(self):
-        self.processor.light = 'Green' if self.processor.light == 'Red' else 'Red'
+        self.processor.setLight('Green' if self.processor.getLight() == 'Red' else 'Red')
 
     def initMenu(self):
         menubar = self.menuBar()
@@ -139,9 +141,9 @@ class MainWindow(QMainWindow):
 
     def keyReleaseEvent(self, event):
         if event.key() == QtCore.Qt.Key_G:
-            self.processor.light = "Green"
+            self.processor.setLight("Green")
         elif event.key() == QtCore.Qt.Key_R:
-            self.processor.light = "Red"
+            self.processor.setLight("Red")
         elif event.key() == QtCore.Qt.Key_S:
             self.toggleLight()
 
@@ -172,7 +174,7 @@ class MainWindow(QMainWindow):
     def update_image(self):
         _, frame = self.vs.read()
 
-        packet = self.processor.cross_violation(frame)
+        packet = self.processor.getProcessedImage(frame)
         cars_violated = packet['list_of_cars']  # list of cropped images of violated cars
         if len(cars_violated) > 0:
             for c in cars_violated:
@@ -192,7 +194,7 @@ class MainWindow(QMainWindow):
     def updateCamInfo(self):
         count, location, self.feed = self.database.getCamDetails(self.cam_selector.currentText())
         self.feed = 'videos/' + self.feed
-        self.processor = TrafficProcessor(self.cam_selector.currentText())
+        self.processor = MainProcessor(self.cam_selector.currentText())
         self.vs = cv2.VideoCapture(self.feed)
         self.cam_id.setText(self.cam_selector.currentText())
         self.address.setText(location)
@@ -246,13 +248,17 @@ class MainWindow(QMainWindow):
 
     @QtCore.pyqtSlot()
     def camChanged(self):
-        self.updateCamInfo()
-        self.updateLog()
+        if not self.cam_clear_gaurd:
+            self.updateCamInfo()
+            self.updateLog()
 
     @QtCore.pyqtSlot()
     def camGroupChanged(self):
         cams = self.database.getCamList(self.camera_group.currentText())
+        self.cam_clear_gaurd = True
         self.cam_selector.clear()
-        self.cam_selector.addItems(name for name, location in cams)
+        self.cam_selector.addItems(name for name, location, feed in cams)
         self.cam_selector.setCurrentIndex(0)
         # self.cam_selector.currentIndexChanged.connect(self.camChanged)
+        self.cam_clear_gaurd = False
+        self.updateCamInfo()
