@@ -1,4 +1,5 @@
 import cv2
+import imutils
 import numpy as np
 import time
 
@@ -116,7 +117,8 @@ class DirectionViolationDetection:
         ## FIND CONTOUR ##
         ##################
         # cv2.rectangle(frame, zone1, zone2, (255, 0, 0), 2)
-        _, contours0, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        contours0 = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        contours0 = imutils.grab_contours(contours0)
         for cnt in contours0:
             # cv2.drawContours(frame, cnt, -1, (0,255,0), 3, 8)
             area = cv2.contourArea(cnt)

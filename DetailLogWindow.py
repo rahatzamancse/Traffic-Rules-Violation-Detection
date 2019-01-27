@@ -32,7 +32,7 @@ class DetailLogWindow(QMainWindow):
             file.write('#'+''.join([' ' for i in range(35 - len(fine))]) + fine + '   #\n')
             file.write('########################################\n')
         self.destroy()
-        os.popen("deepin-editor " + file_name)
+        os.popen("kate " + file_name)
 
     def initData(self):
         self.cam_id.setText(str(self.data[KEYS.CARID]))

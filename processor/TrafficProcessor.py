@@ -21,7 +21,7 @@ class TrafficProcessor:
         self.zone1 = (100, 150)
         self.zone2 = (450, 145)
         self.thres = 30
-        self.dynamic = True
+        self.dynamic = False
 
     def cross_violation(self, frame):
         text = ""
@@ -49,7 +49,8 @@ class TrafficProcessor:
         self.thresh = cv2.dilate(self.thresh, None, iterations=2)
         cnts = cv2.findContours(self.thresh.copy(), cv2.RETR_EXTERNAL,
                                 cv2.CHAIN_APPROX_SIMPLE)
-        cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+        # cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+        cnts = imutils.grab_contours(cnts)
 
         # loop over the contours
         for c in cnts:
@@ -70,7 +71,7 @@ class TrafficProcessor:
                 rcar = self.frame[y:y + h, x:x + w]
                 rcar = cv2.resize(rcar, (0, 0), fx=4, fy=4)
                 cropped_cars.append(rcar)
-                cv2.imwrite('reported_car/reported_car_' + str(self.cnt) + ".jpg", rcar)
+                cv2.imwrite('reported_car/car_' + str(self.cnt) + ".jpg", rcar)
                 self.cnt += 1
                 text = "<Violation>"
 
