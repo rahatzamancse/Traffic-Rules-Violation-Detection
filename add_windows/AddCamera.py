@@ -16,7 +16,7 @@ class AddCamera(AddMainWindow):
         x = str(self.x_coord.text())
         y = str(self.y_coord.text())
         file = str(self.file.text())
-        Database.getInstance().insertIntoCamera(id, location, x, y, group, file)
+        Database.get_instance().insert_into_camera(id, location, x, y, group, file)
         self.destroy()
 
     def getFile(self, lineEdit):

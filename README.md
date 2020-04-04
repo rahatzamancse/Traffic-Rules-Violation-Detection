@@ -14,7 +14,7 @@ Go [here](#quick-starting-the-project) if you don't have time.
 
 ## Table of content
 
-- [TL;DR](#tl;dr)
+- [TL;DR](#TL;DR)
 - [Motivation](#motivation)
 - [Introduction](#introduction)
 - [Objective](#objective)
@@ -27,8 +27,8 @@ Go [here](#quick-starting-the-project) if you don't have time.
     - [Database Structure](#database-structure)
 - [Implementation](#implementation)
     - [Image Processing and Computer Vision](#image-processing-and-computer-vision)
-    - [Graphical User Interface](#graphical-user-interface)
-    - [Rules Violation Video Representation](#rules-violation-video-representation)
+    - [Graphical User Interface](#graphical-user-interface-gui)
+    - [Rules Violation Video Representation](#rules-violation-video-representation-in-ui)
 - [Contributing](#contributing)
 - [Links and References](#links-and-references)
 - [Author](#author)
@@ -46,9 +46,8 @@ The goal of the project is to automate the traffic rules violation detection sys
 
 ## Quick starting the project
 1. `git clone https://github.com/rahatzamancse/EyeTask.git`
-2. Install required python dependencies into your python virtual environment.
-3. Create the following folders in the root of the project directory: `car_images`, `tickets`.
-4. `python3 main.py`
+2. Install required python dependencies from `requirements.txt` into your python virtual environment. (`pip install -r requirements.txt`)
+3. `python main.py`
 
 ## System Overview
 

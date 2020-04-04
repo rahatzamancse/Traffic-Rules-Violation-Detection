@@ -57,8 +57,8 @@ class DetailLogWindow(QMainWindow):
         qm = QtWidgets.QMessageBox
         prompt = qm.question(self, '', "Are you sure to reset all the values?", qm.Yes | qm.No)
         if prompt == qm.Yes:
-            db = Database.getInstance()
-            db.deleteViolation(carid=self.data[KEYS.CARID], ruleid=self.data[KEYS.RULEID], time=self.data[KEYS.TIME])
+            db = Database.get_instance()
+            db.delete_violation(carid=self.data[KEYS.CARID], ruleid=self.data[KEYS.RULEID], time=self.data[KEYS.TIME])
             self.destroy()
         else:
             pass

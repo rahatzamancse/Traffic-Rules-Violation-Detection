@@ -10,13 +10,13 @@ from PyQt5.uic import loadUi
 
 from Archive import ArchiveWindow
 from Database import Database
-from processor.MainProcessor import MainProcessor
-from processor.TrafficProcessor import TrafficProcessor
 from ViolationItem import ViolationItem
 from add_windows.AddCamera import AddCamera
 from add_windows.AddCar import AddCar
 from add_windows.AddRule import AddRule
 from add_windows.AddViolation import AddViolation
+from processor.MainProcessor import MainProcessor
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -37,17 +37,17 @@ class MainWindow(QMainWindow):
         self.clear_button.clicked.connect(self.clear)
         self.refresh_button.clicked.connect(self.refresh)
 
-        self.database = Database.getInstance()
-        self.database.deleteAllCars()
-        self.database.deleteAllViolations()
+        self.database = Database.get_instance()
+        self.database.delete_all_cars()
+        self.database.delete_all_violations()
 
-        cam_groups = self.database.getCamGroupList()
+        cam_groups = self.database.get_cam_group_list()
         self.camera_group.clear()
         self.camera_group.addItems(name for name in cam_groups)
         self.camera_group.setCurrentIndex(0)
         self.camera_group.currentIndexChanged.connect(self.camGroupChanged)
 
-        cams = self.database.getCamList(self.camera_group.currentText())
+        cams = self.database.get_cam_list(self.camera_group.currentText())
         self.cam_selector.clear()
         self.cam_selector.addItems(name for name, location, feed in cams)
         self.cam_selector.setCurrentIndex(0)
@@ -178,13 +178,13 @@ class MainWindow(QMainWindow):
         cars_violated = packet['list_of_cars']  # list of cropped images of violated cars
         if len(cars_violated) > 0:
             for c in cars_violated:
-                carId = self.database.getMaxCarId() + 1
+                carId = self.database.get_max_car_id() + 1
                 car_img = 'car_' + str(carId) + '.png'
                 cv2.imwrite('car_images/' + car_img, c)
-                self.database.insertIntoCars(car_id=carId, car_img=car_img)
+                self.database.insert_into_cars(car_id=carId, car_img=car_img)
 
-                self.database.insertIntoViolations(camera=self.cam_selector.currentText(), car=carId, rule='1',
-                                                   time=time.time())
+                self.database.insert_into_violations(camera=self.cam_selector.currentText(), car=carId, rule='1',
+                                                     time=time.time())
 
             self.updateLog()
 
@@ -192,7 +192,7 @@ class MainWindow(QMainWindow):
         self.live_preview.setPixmap(QPixmap.fromImage(qimg))
 
     def updateCamInfo(self):
-        count, location, self.feed = self.database.getCamDetails(self.cam_selector.currentText())
+        count, location, self.feed = self.database.get_cam_details(self.cam_selector.currentText())
         self.feed = 'videos/' + self.feed
         self.processor = MainProcessor(self.cam_selector.currentText())
         self.vs = cv2.VideoCapture(self.feed)
@@ -202,7 +202,7 @@ class MainWindow(QMainWindow):
 
     def updateLog(self):
         self.violation_list.clear()
-        rows = self.database.getViolationsFromCam(str(self.cam_selector.currentText()))
+        rows = self.database.get_violations_from_cam(str(self.cam_selector.currentText()))
         for row in rows:
             listWidget = ViolationItem()
             listWidget.setData(row)
@@ -227,7 +227,7 @@ class MainWindow(QMainWindow):
         qm = QtWidgets.QMessageBox
         prompt = qm.question(self, '', "Are you sure to reset all the values?", qm.Yes | qm.No)
         if prompt == qm.Yes:
-            self.database.clearCamLog()
+            self.database.clear_cam_log()
             self.updateLog()
         else:
             pass
@@ -254,7 +254,7 @@ class MainWindow(QMainWindow):
 
     @QtCore.pyqtSlot()
     def camGroupChanged(self):
-        cams = self.database.getCamList(self.camera_group.currentText())
+        cams = self.database.get_cam_list(self.camera_group.currentText())
         self.cam_clear_gaurd = True
         self.cam_selector.clear()
         self.cam_selector.addItems(name for name, location, feed in cams)

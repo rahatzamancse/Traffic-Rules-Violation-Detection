@@ -7,7 +7,7 @@ class MainProcessor:
 
     def __init__(self, camera_id):
         self.cam_id = camera_id
-        self.cam_violation_count, self.cam_location, self.cam_feed = Database.getInstance().getCamDetails(camera_id)
+        self.cam_violation_count, self.cam_location, self.cam_feed = Database.get_instance().get_cam_details(camera_id)
 
         if camera_id == 'cam_01' or camera_id == 'cam_03':
             self.processor = TrafficProcessor()

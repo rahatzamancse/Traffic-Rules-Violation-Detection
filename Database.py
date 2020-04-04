@@ -20,11 +20,11 @@ class KEYS(Enum):
     RULEID = 'ruleid'
 
 
-class Database():
+class Database:
     __instance = None
 
     @staticmethod
-    def getInstance():
+    def get_instance():
         if Database.__instance is None:
             Database()
         return Database.__instance
@@ -36,17 +36,17 @@ class Database():
             Database.__instance = self
             self.con = lite.connect("database/traffic.db")
 
-    def getCarColorsList(self):
+    def get_car_color_list(self):
         command = "select distinct(color) from cars"
         rows = self.con.cursor().execute(command).fetchall()
         return [row[0] for row in rows]
 
-    def getLicenseList(self):
+    def get_licenses(self):
         command = "select license_number from cars"
         rows = self.con.cursor().execute(command).fetchall()
         return [row[0] for row in rows]
 
-    def insertIntoCars(self, car_id='', color='', lic_num='', lic_img='', car_img='', owner=''):
+    def insert_into_cars(self, car_id='', color='', lic_num='', lic_img='', car_img='', owner=''):
         sql = '''INSERT INTO cars(id, color,license_image, license_number, car_image, owner)
                       VALUES(?,?,?,?,?,?) '''
 
@@ -57,22 +57,22 @@ class Database():
         cur.close()
         self.con.commit()
 
-    def getMaxCarId(self):
+    def get_max_car_id(self):
         sql = '''select max(id) from cars'''
         carid = self.con.cursor().execute(sql).fetchall()[0][0]
         if carid is None:
             carid = 1
         return carid
 
-    def insertIntoViolations(self, camera, car, rule, time):
+    def insert_into_violations(self, camera, car, rule, time):
         sql = '''INSERT INTO violations(camera, car, rule, time)
                       VALUES(?,?,?,?) '''
         cur = self.con.cursor()
-        cur.execute(sql, (camera, car, rule, self.convertTimeToDB(time)))
+        cur.execute(sql, (camera, car, rule, self.covert_time_to_bd(time)))
         cur.close()
         self.con.commit()
 
-    def insertIntoRules(self, rule, fine):
+    def insert_into_rules(self, rule, fine):
         sql = '''INSERT INTO rules(name, fine)
                       VALUES(?,?) '''
         cur = self.con.cursor()
@@ -80,7 +80,7 @@ class Database():
         cur.close()
         self.con.commit()
 
-    def insertIntoCamera(self, id, location, x, y, group, file):
+    def insert_into_camera(self, id, location, x, y, group, file):
         sql = '''INSERT INTO camera(id,location,coordinate_x, coordinate_y, feed, cam_group)
                       VALUES(?,?,?,?,?,?) '''
         file = file.split('/')[-1]
@@ -105,37 +105,31 @@ class Database():
             command = command + " and cars.color = '" + str(color) + "'"
         if time is not None:
             command = command + " and violations.time >= " + str(
-                self.convertTimeToDB(time[0])) + " and violations.time <= " + str(self.convertTimeToDB(time[1]))
+                self.covert_time_to_bd(time[0])) + " and violations.time <= " + str(self.covert_time_to_bd(time[1]))
 
         cur.execute(command)
         rows = cur.fetchall()
         ret = []
         for row in rows:
-            dict = {}
-            dict[KEYS.LOCATION] = row[0]
-            dict[KEYS.CARID] = row[1]
-            dict[KEYS.CARCOLOR] = row[2]
-            dict[KEYS.FIRSTSIGHTED] = row[3]
-
-            carimage = QPixmap("car_images/" + row[4])
-            dict[KEYS.CARIMAGE] = carimage
-
-            dict[KEYS.LICENSENUMBER] = row[5]
-
-            licenseimage = QPixmap("license_images/" + row[6])
-            dict[KEYS.LICENSEIMAGE] = licenseimage
-
-            dict[KEYS.NUMRULESBROKEN] = row[7]
-            dict[KEYS.CAROWNER] = row[8]
-            dict[KEYS.RULENAME] = row[9]
-            dict[KEYS.RULEFINE] = row[10]
-            dict[KEYS.TIME] = row[11]
-            dict[KEYS.RULEID] = row[12]
-            ret.append(dict)
+            ret.append({
+                KEYS.LOCATION: row[0],
+                KEYS.CARID: row[1],
+                KEYS.CARCOLOR: row[2],
+                KEYS.FIRSTSIGHTED: row[3],
+                KEYS.CARIMAGE: QPixmap("car_images/" + row[4]),
+                KEYS.LICENSENUMBER: row[5],
+                KEYS.LICENSEIMAGE: QPixmap("license_images/" + row[6]),
+                KEYS.NUMRULESBROKEN: row[7],
+                KEYS.CAROWNER: row[8],
+                KEYS.RULENAME: row[9],
+                KEYS.RULEFINE: row[10],
+                KEYS.TIME: row[11],
+                KEYS.RULEID: row[12],
+            })
         cur.close()
         return ret
 
-    def getViolationsFromCam(self, cam, cleared=False):
+    def get_violations_from_cam(self, cam, cleared=False):
         cur = self.con.cursor()
         command = "SELECT camera.location, cars.id, cars.color, cars.first_sighted, cars.license_image, " \
                   " cars.license_number, cars.car_image, cars.num_rules_broken, cars.owner," \
@@ -155,32 +149,26 @@ class Database():
         rows = cur.fetchall()
         ret = []
         for row in rows:
-            dict = {}
-            dict[KEYS.LOCATION] = row[0]
-            dict[KEYS.CARID] = row[1]
-            dict[KEYS.CARCOLOR] = row[2]
-            dict[KEYS.FIRSTSIGHTED] = row[3]
+            ret.append({
+                KEYS.LOCATION: row[0],
+                KEYS.CARID: row[1],
+                KEYS.CARCOLOR: row[2],
+                KEYS.FIRSTSIGHTED: row[3],
+                KEYS.CARIMAGE: QPixmap("car_images/" + row[6]),
+                KEYS.LICENSENUMBER: row[5],
+                KEYS.LICENSEIMAGE: QPixmap("license_images/" + row[6]),
+                KEYS.NUMRULESBROKEN: row[7],
+                KEYS.CAROWNER: row[8],
+                KEYS.RULENAME: row[9],
+                KEYS.RULEFINE: row[10],
+                KEYS.TIME: row[11],
+                KEYS.RULEID: row[12],
 
-            carImagePath = "car_images/" + row[6]
-            carimage = QPixmap(carImagePath)
-            dict[KEYS.CARIMAGE] = carimage
-
-            dict[KEYS.LICENSENUMBER] = row[5]
-
-            licenseimage = QPixmap("license_images/" + row[6])
-            dict[KEYS.LICENSEIMAGE] = licenseimage
-
-            dict[KEYS.NUMRULESBROKEN] = row[7]
-            dict[KEYS.CAROWNER] = row[8]
-            dict[KEYS.RULENAME] = row[9]
-            dict[KEYS.RULEFINE] = row[10]
-            dict[KEYS.TIME] = row[11]
-            dict[KEYS.RULEID] = row[12]
-            ret.append(dict)
+            })
         cur.close()
         return ret
 
-    def deleteViolation(self, carid, ruleid, time):
+    def delete_violation(self, carid, ruleid, time):
         cur = self.con.cursor()
         command = "update violations set cleared = true " \
                   "where car = " + str(carid) + " and rule = " + str(ruleid) + " and time = " + str(time)
@@ -189,7 +177,7 @@ class Database():
         cur.close()
         self.con.commit()
 
-    def getCamDetails(self, cam_id):
+    def get_cam_details(self, cam_id):
         command = "select count(*) from violations where camera = '" + str(cam_id) + "'"
         cur = self.con.cursor()
         count = cur.execute(command).fetchall()[0][0]
@@ -204,21 +192,21 @@ class Database():
         cur.close()
         return count, location, feed
 
-    def deleteAllCars(self):
+    def delete_all_cars(self):
         commad = "delete from cars"
         cur = self.con.cursor()
         cur.execute(commad)
         cur.close()
         self.con.commit()
 
-    def deleteAllViolations(self):
+    def delete_all_violations(self):
         commad = "delete from violations"
         cur = self.con.cursor()
         cur.execute(commad)
         cur.close()
         self.con.commit()
 
-    def getCamList(self, group):
+    def get_cam_list(self, group):
         if group is not None:
             command = "select id, location, feed from camera where cam_group = '{}'".format(str(group))
         else:
@@ -231,7 +219,7 @@ class Database():
         cur.close()
         return ret
 
-    def getCamGroupList(self):
+    def get_cam_group_list(self):
         command = "select name from camera_group"
         cur = self.con.cursor()
         cur.execute(command)
@@ -240,15 +228,15 @@ class Database():
         cur.close()
         return ret
 
-    def clearCamLog(self):
+    def clear_cam_log(self):
         command = "update violations set cleared = true"
         cur = self.con.cursor()
         cur.execute(command)
         cur.close()
         self.con.commit()
 
-    def convertTimeToDB(self, time):
+    def covert_time_to_bd(self, time):
         pass
 
-    def convertTimeToGUI(self, time):
+    def convert_time_to_GUI(self, time):
         pass

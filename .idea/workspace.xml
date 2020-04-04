@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="81fb0d1e-fdd6-4386-b184-f97943ec65b4" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand>
+      <path>
+        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
+        <item name="Database" type="feb32156:DbDataSourceImpl" />
+      </path>
+      <path>
+        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
+        <item name="Database" type="feb32156:DbDataSourceImpl" />
+        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
+      </path>
+      <path>
+        <item name="Database" type="3277223f:DatabaseStructure$DbRootGroup" />
+        <item name="Database" type="feb32156:DbDataSourceImpl" />
+        <item name="schemas" type="d4e8921:DatabaseStructure$FamilyGroup" />
+        <item name="main: schema" type="981a47c2:SqliteImplModel$Schema" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ProjectId" id="1ZsGQ5jwsNHJwFOU7hYLAw4DMZg" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DatabaseDriversLRU" value="sqlite.xerial" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/main.py" />
+    <property name="run.code.analysis.last.selected.profile" value="aDefault" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RunManager">
+    <configuration name="Main" type="PythonConfigurationType" factoryName="Python">
+      <module name="Traffic-Rules-Violation-Detection" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$PROJECT_DIR$/../.miniconda3/envs/traffic/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="Traffic-Rules-Violation-Detection" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$PROJECT_DIR$/../.miniconda3/envs/traffic/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="81fb0d1e-fdd6-4386-b184-f97943ec65b4" name="Default Changelist" comment="" />
+      <created>1585620368105</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1585620368105</updated>
+      <workItem from="1585620372429" duration="1701000" />
+      <workItem from="1585984643500" duration="4896000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="555" y="215" width="800" height="684" key="#SQL_Dialects" timestamp="1585987081402">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="555" y="215" width="800" height="684" key="#SQL_Dialects/0.27.1920.1053/1920.188.1366.768@0.27.1920.1053" timestamp="1585987081402" />
+    <state x="418" y="211" width="1084" height="730" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1585987046040">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="418" y="211" width="1084" height="730" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/1920.188.1366.768@0.27.1920.1053" timestamp="1585987046040" />
+    <state x="710" y="423" width="489" height="268" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1585985323968">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="710" y="423" width="489" height="268" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.27.1920.1053/1920.188.1366.768@0.27.1920.1053" timestamp="1585985323968" />
+    <state x="674" y="340" width="424" height="491" key="FileChooserDialogImpl" timestamp="1585987029284">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="674" y="340" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053/1920.188.1366.768@0.27.1920.1053" timestamp="1585987029284" />
+    <state width="1320" height="172" key="GridCell.Tab.0.bottom" timestamp="1585997032668">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state width="1320" height="172" key="GridCell.Tab.0.bottom/0.27.1366.741/1920.188.1366.768@0.27.1366.741" timestamp="1585997032668" />
+    <state width="1874" height="275" key="GridCell.Tab.0.bottom/0.27.1920.1053/1920.188.1366.768@0.27.1920.1053" timestamp="1585986885665" />
+    <state width="1320" height="172" key="GridCell.Tab.0.center" timestamp="1585997032668">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state width="1320" height="172" key="GridCell.Tab.0.center/0.27.1366.741/1920.188.1366.768@0.27.1366.741" timestamp="1585997032668" />
+    <state width="1874" height="275" key="GridCell.Tab.0.center/0.27.1920.1053/1920.188.1366.768@0.27.1920.1053" timestamp="1585986885665" />
+    <state width="1320" height="172" key="GridCell.Tab.0.left" timestamp="1585997032668">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state width="1320" height="172" key="GridCell.Tab.0.left/0.27.1366.741/1920.188.1366.768@0.27.1366.741" timestamp="1585997032668" />
+    <state width="1874" height="275" key="GridCell.Tab.0.left/0.27.1920.1053/1920.188.1366.768@0.27.1920.1053" timestamp="1585986885665" />
+    <state width="1320" height="172" key="GridCell.Tab.0.right" timestamp="1585997032668">
+      <screen x="0" y="27" width="1366" height="741" />
+    </state>
+    <state width="1320" height="172" key="GridCell.Tab.0.right/0.27.1366.741/1920.188.1366.768@0.27.1366.741" timestamp="1585997032668" />
+    <state width="1874" height="275" key="GridCell.Tab.0.right/0.27.1920.1053/1920.188.1366.768@0.27.1920.1053" timestamp="1585986885665" />
+    <state x="456" y="189" width="1007" height="737" key="SettingsEditor" timestamp="1585984786490">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="456" y="187" width="1007" height="737" key="SettingsEditor/0.25.1920.1055/1920.159.1366.768@0.25.1920.1055" timestamp="1585620891843" />
+    <state x="456" y="189" width="1007" height="737" key="SettingsEditor/0.27.1920.1053/1920.188.1366.768@0.27.1920.1053" timestamp="1585984786490" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Traffic_Rules_Violation_Detection$Main.coverage" NAME="Main Coverage Results" MODIFIED="1585997032658" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>

@@ -17,7 +17,7 @@ class ArchiveWindow(QMainWindow):
         self.violation_list = QListWidget(self)
         self.log_tabwidget.addTab(self.violation_list, "Violations")
         self.violation_list.clear()
-        rows = Database.getInstance().getViolationsFromCam(None, cleared=True)
+        rows = Database.get_instance().get_violations_from_cam(None, cleared=True)
         for row in rows:
             listWidget = ViolationItem()
             listWidget.setData(row)

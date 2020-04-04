@@ -11,5 +11,5 @@ class AddViolation(AddMainWindow):
         car = str(self.car.text())
         rule = str(self.rule.text())
         time = self.time.dateTime()
-        Database.getInstance().insertIntoViolations(camera, car, rule, time)
+        Database.get_instance().insert_into_violations(camera, car, rule, time)
         self.destroy()

@@ -9,5 +9,5 @@ class AddRule(AddMainWindow):
     def addToDatabase(self):
         rule = str(self.rule.text())
         fine = str(self.fine.text())
-        Database.getInstance().insertIntoRules(rule, fine)
+        Database.get_instance().insert_into_rules(rule, fine)
         self.destroy()
