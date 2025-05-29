@@ -141,9 +141,9 @@ class Database:
         if cam is not None:
             command = command + " and violations.camera = '" + str(cam) + "'"
         if cleared:
-            command = command + " and violations.cleared = true"
+            command = command + " and violations.cleared = 1"
         else:
-            command = command + " and violations.cleared = false"
+            command = command + " and violations.cleared = 0"
 
         cur.execute(command)
         rows = cur.fetchall()
